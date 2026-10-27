@@ -54,6 +54,10 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: '939edb81f78bc31df2f9b60b6223a0fb'
         run: npx wrangler pages deploy dist --project-name ndx5s --branch main --skip-caching
+      - name: Sync published JSON for ChatGPT alerts
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: python scripts/sync_alert_data.py
       - name: Verify published JSON and cache headers
         run: python scripts/verify_publication.py --url https://ndx5s.pages.dev --attempts 6
       - name: Report unsuccessful data refresh

@@ -2,7 +2,7 @@ name: NDX5S daily close
 on:
   push:
     branches: [main]
-    paths: ['web/**', 'scripts/build_site.py']
+    paths: ['web/**', 'scripts/build_site.py', 'scripts/sync_alert_data.py']
   schedule:
     # 北京时间次日 04:17、05:17 提前取数，06:17 兜底补跑。
     - cron: '17 20,21,22 * * 1-5'
@@ -72,6 +72,11 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: '939edb81f78bc31df2f9b60b6223a0fb'
         run: npx wrangler pages deploy dist --project-name ndx5s --branch main --skip-caching
+      - name: Sync published JSON for ChatGPT alerts
+        if: steps.gate.outputs.eligible == 'true' || github.event_name != 'schedule'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: python scripts/sync_alert_data.py
       - name: Verify published JSON and cache headers
         if: steps.gate.outputs.eligible == 'true' || github.event_name != 'schedule'
         run: python scripts/verify_publication.py --url https://ndx5s.pages.dev --attempts 6

@@ -14,7 +14,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-ORIGINAL_SHA = 'fdfc5ddf0e17b4340a6d09bdcb51911b15c08376dc52074b59bf342a18a73f15'
+ORIGINAL_SHA = '58cf62cf3eb8061cff3aea5b8eb71119782432fa9b3a00d0bc658d84ef61d0cf'
 MODULES = [('价格', ['ndx','ma200','dd']), ('宽度', ['br']), ('VIX', ['vix']), ('实际利率', ['ry','ma20','ma60']), ('Forward EPS', ['eps'])]
 
 def load_report(path):

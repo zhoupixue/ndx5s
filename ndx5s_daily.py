@@ -40,13 +40,17 @@ def get(url):
     return r
 
 
-def first_ok(label, fns):
-    """依次尝试各来源，成功即返回；全部失败返回 None（标记数据缺失）。"""
+def first_ok(label, fns, *, required_date=None):
+    """返回首个有效来源，可要求包含指定交易日的观测值。"""
     for name, fn in fns:
         try:
             s = fn()
             if s is None or len(s) == 0:
                 raise ValueError("空数据")
+            if required_date is not None:
+                if required_date not in s.index:
+                    raise ValueError(f"缺少 {required_date.date()} 收盘数据，最新为 {s.index.max().date()}")
+                s = s[s.index <= required_date]
             SOURCES[label] = [name, str(s.index.max().date())]
             return s
         except Exception as e:  # noqa: BLE001
@@ -472,7 +476,8 @@ def main():
         if SOURCES["价格"][0].startswith("FRED"):
             NOTES.append("价格使用 FRED 备用源：历史高点按近 10 年计算，数据约晚一个交易日")
         vix = first_ok("VIX", [("CBOE 官方 CSV", cboe_vix), ("FRED VIXCLS", lambda: fred("VIXCLS")),
-                               ("Yahoo ^VIX", lambda: yf_hist("^VIX"))])
+                               ("Yahoo ^VIX", lambda: yf_hist("^VIX"))],
+                       required_date=ndx.index[-1])
         ry = first_ok("实际利率", [("FRED DFII10", lambda: fred("DFII10")),
                                  ("Treasury 实际收益率曲线", treasury_real)])
         sp = nd = None

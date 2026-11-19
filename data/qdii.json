@@ -2,11 +2,11 @@
   "schema_version": 1,
   "source": "FEIXIA",
   "source_url": "https://feixia.org/",
-  "fetched_at": "2026-11-19T02:45:31.445601+00:00",
+  "fetched_at": "2026-11-19T12:03:14.895620+00:00",
   "source_update_label": "1小时前",
   "source_updated_at": null,
   "source_total_yuan": 140.0,
-  "source_sha256": "f967189425bdd01f97e7944b6bc0a8701fced8b2c2ac25f1c61340fa88316808",
+  "source_sha256": "ce62b010211dd559760cdfdd1fadfbd1ddb92e8d163c2ea7a1622c371b2271e8",
   "share_count": 43,
   "group_count": 22,
   "counts": {
@@ -63,17 +63,17 @@
       "source_label": "5元"
     },
     {
-      "code": "539001",
-      "name": "建信纳斯达克100指数QDIIA",
-      "share_class": "A",
+      "code": "012752",
+      "name": "建信纳斯达克100指数（QDII）C",
+      "share_class": "C",
       "status": "limited",
       "limit_yuan": 10.0,
       "source_label": "10元"
     },
     {
-      "code": "012752",
-      "name": "建信纳斯达克100指数（QDII）C",
-      "share_class": "C",
+      "code": "539001",
+      "name": "建信纳斯达克100指数QDIIA",
+      "share_class": "A",
       "status": "limited",
       "limit_yuan": 10.0,
       "source_label": "10元"

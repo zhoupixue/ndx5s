@@ -32,6 +32,21 @@ class QDIITests(unittest.TestCase):
     def test_missing_previous_fund_rejected(self):
         d=q.parse_homepage(fixture());first=q.make_snapshot(d,[]);d['funds'].pop()
         with self.assertRaises(ValueError):q.make_snapshot(d,[],first)
+    def test_persistent_absence_releases_other_fund_updates(self):
+        previous = q.make_snapshot(q.parse_homepage(fixture()), [])
+        parsed = q.parse_homepage(fixture('5', '5元'))
+        parsed['funds'].pop()
+        counts = {}
+        for expected in (1, 2):
+            with self.assertRaises(q.UnconfirmedMissingFunds) as rejected:
+                q.make_snapshot(parsed, [], previous, missing_counts=counts)
+            counts = rejected.exception.counts
+            self.assertEqual(counts, {'019737': expected})
+        updated = q.make_snapshot(parsed, [], previous, missing_counts=counts)
+        q.validate_snapshot(updated)
+        self.assertEqual([r['code'] for r in updated['funds']], ['019736'])
+        self.assertEqual(updated['changes'][0]['limit_yuan'], 5)
+
     def test_failed_fetch_preserves_previous_snapshot(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder);(root/'data').mkdir();p=root/'data/qdii.json';p.write_text('unchanged')

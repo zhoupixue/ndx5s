@@ -118,11 +118,28 @@ def validate_snapshot(data):
     if data['group_count']!=len(data['groups']) or sorted(members,key=lambda r:r['code'])!=sorted(funds,key=lambda r:r['code']): raise ValueError('QDII 合并丢失或重复份额')
     return data
 
-def make_snapshot(parsed, mapping, previous=None, captured=None, digest=None):
+MISSING_CONFIRMATIONS = 3
+
+
+class UnconfirmedMissingFunds(ValueError):
+    def __init__(self, counts):
+        self.counts = counts
+        pending = ', '.join(f'{code} ({count}/{MISSING_CONFIRMATIONS})'
+                            for code, count in sorted(counts.items())
+                            if count < MISSING_CONFIRMATIONS)
+        super().__init__('待确认缺失份额，保留上一版：' + pending)
+
+
+def make_snapshot(parsed, mapping, previous=None, captured=None, digest=None, *, missing_counts=None):
     captured=captured or now().isoformat();funds=copy.deepcopy(parsed['funds'])
     groups=group_funds(funds,mapping);counts=Counter(r['status'] for r in funds)
     previous=previous or {};old={r['code']:r for r in previous.get('funds',[])}
-    if old and set(old)-{r['code'] for r in funds}: raise ValueError('源页面漏掉已监控份额，保留上一版')
+    missing_counts = missing_counts or {}
+    absent = set(old) - {r['code'] for r in funds}
+    counts_by_code = {code: min(missing_counts.get(code, 0) + 1, MISSING_CONFIRMATIONS)
+                      for code in absent}
+    if any(count < MISSING_CONFIRMATIONS for count in counts_by_code.values()):
+        raise UnconfirmedMissingFunds(counts_by_code)
     history=previous.get('changes',[])[:200]
     for r in funds:
         last=old.get(r['code'])
@@ -149,7 +166,11 @@ def fetch_snapshot():
     if len(raw)>2_000_000: raise ValueError('源页面体积异常')
     path=ROOT/'data/qdii.json';previous=json.loads(path.read_text()) if path.exists() else None
     mapping=json.loads((ROOT/'data/qdii_groups.json').read_text())
-    return make_snapshot(parse_homepage(raw),mapping,previous,digest=hashlib.sha256(raw).hexdigest())
+    status_path = ROOT/'data/qdii_status.json'
+    status = json.loads(status_path.read_text()) if status_path.exists() else {}
+    return make_snapshot(parse_homepage(raw), mapping, previous,
+                         digest=hashlib.sha256(raw).hexdigest(),
+                         missing_counts=status.get('missing_counts'))
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--gate-only',action='store_true');ap.add_argument('--force',action='store_true');a=ap.parse_args()
@@ -164,7 +185,10 @@ def main():
         atomic(ROOT/'data/qdii_status.json',dict(success=True,attempted_at=attempted))
         print(f"QDII 已核验：{snapshot['share_count']} 个份额，{snapshot['group_count']} 行")
     except Exception as e:
-        atomic(ROOT/'data/qdii_status.json',dict(success=False,attempted_at=attempted,message='本次获取或校验失败，保留上次数据'))
+        status = dict(success=False, attempted_at=attempted, message='本次获取或校验失败，保留上次数据')
+        if isinstance(e, UnconfirmedMissingFunds):
+            status['missing_counts'] = e.counts
+        atomic(ROOT/'data/qdii_status.json', status)
         print('QDII 更新失败：'+str(e),file=sys.stderr);raise
 
 if __name__=='__main__':main()

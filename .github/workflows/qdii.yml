@@ -8,7 +8,7 @@ permissions:
   contents: write
 concurrency:
   group: ndx5s-production
-  cancel-in-progress: false
+  queue: max
 jobs:
   update:
     runs-on: ubuntu-latest

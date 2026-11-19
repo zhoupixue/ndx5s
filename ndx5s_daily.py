@@ -40,21 +40,33 @@ def get(url):
     return r
 
 
-def first_ok(label, fns, *, required_date=None):
-    """返回首个有效来源，可要求包含指定交易日的观测值。"""
+def first_ok(label, fns, *, required_date=None, allow_previous=False):
+    """优先返回指定日期的数据，可回退到日期最近的历史观测。"""
+    previous = None
     for name, fn in fns:
         try:
             s = fn()
             if s is None or len(s) == 0:
                 raise ValueError("空数据")
             if required_date is not None:
+                s = s[s.index <= required_date].sort_index()
+                if s.empty:
+                    raise ValueError("没有指定日期或更早的观测")
                 if required_date not in s.index:
-                    raise ValueError(f"缺少 {required_date.date()} 收盘数据，最新为 {s.index.max().date()}")
-                s = s[s.index <= required_date]
+                    latest = s.index.max()
+                    if not allow_previous:
+                        raise ValueError(f"缺少 {required_date.date()} 收盘数据，最新为 {latest.date()}")
+                    if previous is None or latest > previous[1].index.max():
+                        previous = (name, s)
+                    continue
             SOURCES[label] = [name, str(s.index.max().date())]
             return s
         except Exception as e:  # noqa: BLE001
             note(f"{label}：{name} 失败（{type(e).__name__}: {str(e)[:80]}）")
+    if previous is not None:
+        name, s = previous
+        SOURCES[label] = [name, str(s.index.max().date())]
+        return s
     note(f"{label}：所有来源失败，标记为数据缺失")
     return None
 
@@ -479,7 +491,8 @@ def main():
                                ("Yahoo ^VIX", lambda: yf_hist("^VIX"))],
                        required_date=ndx.index[-1])
         ry = first_ok("实际利率", [("FRED DFII10", lambda: fred("DFII10")),
-                                 ("Treasury 实际收益率曲线", treasury_real)])
+                                 ("Treasury 实际收益率曲线", treasury_real)],
+                      required_date=ndx.index[-1], allow_previous=True)
         sp = nd = None
         if not (a.skip_breadth and a.skip_eps):
             nd = first_list("NDX 成分股", [("Wikipedia", ndx_wiki),
@@ -554,8 +567,11 @@ def main():
         if ry is None:
             raise ValueError("无实际利率数据")
         c, m20, m60 = card_ry(ry)
+        observed = ry.index.max()
+        if observed < base[-1]:
+            c["s"].append(f"观测日期 {observed.date()}")
         cards.append(c)
-        r_, a20, a60 = (align(x, base, "实际利率") for x in (ry, m20, m60))
+        r_, a20, a60 = (align(x, base, "实际利率").where(base <= observed) for x in (ry, m20, m60))
         D.update(ry=lst(r_.iloc[-N_VIEW:], 3), ma20=lst(a20.iloc[-N_VIEW:], 3), ma60=lst(a60.iloc[-N_VIEW:], 3))
     except Exception as e:  # noqa: BLE001
         cards.append(missing("04 资金价格"))

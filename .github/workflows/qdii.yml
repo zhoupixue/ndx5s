@@ -12,7 +12,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,6 +26,11 @@ jobs:
         id: fetch
         continue-on-error: true
         run: python scripts/update_qdii.py --force
+      - name: Catch up missed NDX5S report
+        id: daily
+        continue-on-error: true
+        timeout-minutes: 30
+        run: python scripts/update_daily.py --catch-up --skip-build
       - name: Validate and build
         run: |
           python -m unittest discover -s tests
@@ -36,8 +41,12 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data/qdii.json data/qdii_status.json
+          if [ '${{ steps.daily.outcome }}' = 'success' ]; then
+            git add data/ndx_fwd_eps.csv data/spx_close.json
+            git add -f reports/latest.html
+          fi
           if ! git diff --cached --quiet; then
-            git commit -m 'Update QDII monitoring snapshot'
+            git commit -m 'Update QDII snapshot and catch up daily report when needed'
             git push
           fi
       - uses: actions/setup-node@v4
@@ -61,5 +70,5 @@ jobs:
       - name: Verify published JSON and cache headers
         run: python scripts/verify_publication.py --url https://ndx5s.pages.dev --attempts 6
       - name: Report unsuccessful data refresh
-        if: steps.fetch.outcome == 'failure'
+        if: steps.fetch.outcome == 'failure' || steps.daily.outcome == 'failure'
         run: exit 1

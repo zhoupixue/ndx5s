@@ -25,7 +25,6 @@ function render(){
    if(fund.group.index!==section.index||fund.quota.available!==section.available)continue;
    const row=node('li','qdii-fund-row');
    row.append(node('span','qdii-fund-name',fund.group.name),
-    node('span','qdii-index',section.label),
     node('span','qdii-limit '+fund.quota.tone,fund.quota.label));
    card.append(row);
   }

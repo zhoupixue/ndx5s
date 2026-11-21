@@ -13,10 +13,9 @@
 #qdii-retry{border:1px solid var(--bd);border-radius:8px;background:var(--cd);padding:8px 14px;font-size:14px;min-height:40px}
 .qdii-list{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-items:start}
 .qdii-group{margin:0;padding:4px 12px;border:1px solid var(--bd);background:var(--cd);border-radius:12px;min-width:0;list-style:none}
-.qdii-fund-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:6px;min-height:38px;padding:6px 0}
+.qdii-fund-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;min-height:38px;padding:6px 0}
 .qdii-fund-row+.qdii-fund-row{border-top:1px solid var(--bd)}
 .qdii-fund-name{font-size:14px;line-height:1.4;overflow-wrap:anywhere}
-.qdii-index{color:var(--tx2);background:var(--sf);padding:2px 5px;border-radius:5px;font-size:11px;white-space:nowrap}
 .qdii-limit{font-size:14px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
 .qdii-limit.warn{color:var(--warn)}.qdii-limit.ok{color:var(--ok)}.qdii-limit.mut{color:var(--tx2)}
 .qdii-empty{font-size:14px;color:var(--tx2);padding:8px 0}

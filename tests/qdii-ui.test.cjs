@@ -7,14 +7,15 @@ async function boot(fail=false,snapshot=data){const dom=new JSDOM(fs.readFileSyn
  const cards=[...d.querySelectorAll('.qdii-group')];
  assert.deepEqual(cards.map(card=>card.getAttribute('aria-label')),['纳指有额度','标普有额度','纳指无额度','标普无额度']);
  assert.equal(d.querySelectorAll('.qdii-fund-row').length,data.group_count);
- assert.equal(d.querySelector('#qdii-list h3, .qdii-share, #qdii-metrics'),null);
+ assert.equal(d.querySelector('#qdii-list h3, .qdii-share, .qdii-index, #qdii-metrics'),null);
  for(const g of data.groups){
   const index=g.index==='ndx'?'纳指':'标普';
   const available=g.shares.some(s=>s.status!=='paused');
   const card=cards.find(e=>e.getAttribute('aria-label')===index+(available?'有额度':'无额度'));
   const row=[...card.querySelectorAll('.qdii-fund-row')].find(e=>e.firstElementChild.textContent===g.name);
   assert.ok(row,g.name);
-  assert.equal(row.children[1].textContent,index);
+  assert.equal(row.children.length,2);
+  assert.ok(row.children[1].classList.contains('qdii-limit'));
  }
  const mixed=await boot(false,{...data,groups:[
   {name:'限额测试',index:'ndx',shares:[{status:'limited',limit_yuan:100},{status:'limited',limit_yuan:200}]},

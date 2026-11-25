@@ -2,11 +2,11 @@
   "schema_version": 1,
   "source": "FEIXIA",
   "source_url": "https://feixia.org/",
-  "fetched_at": "2026-11-24T16:15:04.438083+00:00",
+  "fetched_at": "2026-11-25T01:00:07.145481+00:00",
   "source_update_label": "昨天",
   "source_updated_at": null,
   "source_total_yuan": 140.0,
-  "source_sha256": "36eb18984c44e331f8e2246043177968c6ef2d2037bbef83fafa1250299ed7d1",
+  "source_sha256": "f29c2d33a770016e34f9b9840523f1df82f90b68ec34491fa0464794a5404c7b",
   "share_count": 43,
   "group_count": 22,
   "counts": {

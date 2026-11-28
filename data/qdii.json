@@ -2,11 +2,11 @@
   "schema_version": 1,
   "source": "FEIXIA",
   "source_url": "https://feixia.org/",
-  "fetched_at": "2026-11-27T22:53:49.196618+00:00",
-  "source_update_label": "昨天",
+  "fetched_at": "2026-11-28T04:54:49.973599+00:00",
+  "source_update_label": "3小时前",
   "source_updated_at": null,
-  "source_total_yuan": 140.0,
-  "source_sha256": "203ac96f2a1045c71307255fe54755872845ae8f0ab1ae1c6e018b5225bb876a",
+  "source_total_yuan": 130.0,
+  "source_sha256": "662583949aaa32e7e4ccc4ae552023bd48e979ea50be256be27b26992466d247",
   "share_count": 43,
   "group_count": 22,
   "counts": {
@@ -35,16 +35,16 @@
       "name": "大成纳斯达克100ETF联接(QDII)A",
       "share_class": "A",
       "status": "limited",
-      "limit_yuan": 10.0,
-      "source_label": "10元"
+      "limit_yuan": 5.0,
+      "source_label": "5元"
     },
     {
       "code": "008971",
       "name": "大成纳斯达克100ETF联接(QDII)C",
       "share_class": "C",
       "status": "limited",
-      "limit_yuan": 10.0,
-      "source_label": "10元"
+      "limit_yuan": 5.0,
+      "source_label": "5元"
     },
     {
       "code": "019524",
@@ -393,16 +393,16 @@
           "name": "大成纳斯达克100ETF联接(QDII)A",
           "share_class": "A",
           "status": "limited",
-          "limit_yuan": 10.0,
-          "source_label": "10元"
+          "limit_yuan": 5.0,
+          "source_label": "5元"
         },
         {
           "code": "008971",
           "name": "大成纳斯达克100ETF联接(QDII)C",
           "share_class": "C",
           "status": "limited",
-          "limit_yuan": 10.0,
-          "source_label": "10元"
+          "limit_yuan": 5.0,
+          "source_label": "5元"
         }
       ]
     },
@@ -860,6 +860,24 @@
     }
   ],
   "changes": [
+    {
+      "code": "008971",
+      "name": "大成纳斯达克100ETF联接(QDII)C",
+      "observed_at": "2026-11-28T04:54:49.973599+00:00",
+      "previous_status": "limited",
+      "previous_limit_yuan": 10.0,
+      "status": "limited",
+      "limit_yuan": 5.0
+    },
+    {
+      "code": "000834",
+      "name": "大成纳斯达克100ETF联接(QDII)A",
+      "observed_at": "2026-11-28T04:54:49.973599+00:00",
+      "previous_status": "limited",
+      "previous_limit_yuan": 10.0,
+      "status": "limited",
+      "limit_yuan": 5.0
+    },
     {
       "code": "019442",
       "name": "万家纳斯达克100指数发起式（QDII）C",
